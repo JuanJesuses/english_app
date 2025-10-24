@@ -5,9 +5,10 @@ from utils import mostrar_datos_tabla
 
 # palabras.py
 def abrir_ventana_words(parent):
+
     ventana_a = tk.Toplevel(parent)
     ventana_a.title("Gestión de Palabras")
-    ventana_a.geometry("500x300")
+    ventana_a.geometry("600x400")
     ventana_a.configure(bg="#f5f5f5")
 
     style = ttk.Style()
@@ -42,7 +43,7 @@ def abrir_ventana_words(parent):
 
         exito = database.crear_tabla_palabras(ing, esp)
         if not exito:
-            messagebox.showerror("Duplicado", "La palabra ya existe.", parent=ventana_a)
+            messagebox.showerror("ERROR!", "La palabra ya existe!!", parent=ventana_a)
             entrada_palabras_eng.delete(0, tk.END)
             entrada_palabras_esp.delete(0, tk.END)
         else:
