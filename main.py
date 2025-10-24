@@ -4,6 +4,7 @@ from palabras import abrir_ventana_words
 from expresiones import abrir_ventana_exps
 from phrasal import abrir_ventana_phrasal
 
+
 # Crear ventana principal
 ventana_principal = tk.Tk()
 ventana_principal.title("English Store")
@@ -32,5 +33,3 @@ ttk.Button(frame, text="Salir", command=ventana_principal.destroy).grid(row=4, c
 
 # Ejecutar la aplicación
 ventana_principal.mainloop()
-
-# Prueba de comentario

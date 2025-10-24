@@ -17,6 +17,9 @@ def eliminar_registro(tabla, tree):
 
         tree.delete(item)
 
+    messagebox.showinfo("✅ Eliminado", "El registro ha sido eliminado correctamente.")
+
+
 def editar_registro(tabla, tree):
     item = tree.selection()
     if not item:
@@ -26,22 +29,37 @@ def editar_registro(tabla, tree):
     id_registro, campo_ing, campo_esp = valores
 
     ventana_edicion = tk.Toplevel()
-    ventana_edicion.title("Editar registro")
-    ventana_edicion.geometry("300x200")
+    ventana_edicion.title("✏️ Editar registro")
+    ventana_edicion.geometry("340x240")
+    ventana_edicion.configure(bg="#f0f4ff")
 
-    tk.Label(ventana_edicion, text="Inglés:").pack(pady=5)
-    entrada_ing = tk.Entry(ventana_edicion)
+    style = ttk.Style()
+    style.theme_use("clam")
+
+    style.configure("TLabel", background="#f0f4ff", font=("Segoe UI", 11))
+    style.configure("TEntry", font=("Segoe UI", 10))
+    style.configure("Guardar.TButton", background="#4F46E5", foreground="white", font=("Segoe UI", 10, "bold"), padding=6)
+    style.map("Guardar.TButton",
+              background=[("active", "#6366F1")],
+              foreground=[("active", "white")])
+
+    ttk.Label(ventana_edicion, text="🗣 Inglés:").pack(pady=(10, 2))
+    entrada_ing = ttk.Entry(ventana_edicion, width=30)
     entrada_ing.insert(0, campo_ing)
-    entrada_ing.pack()
+    entrada_ing.pack(pady=(0, 10))
 
-    tk.Label(ventana_edicion, text="Español:").pack(pady=5)
-    entrada_esp = tk.Entry(ventana_edicion)
+    ttk.Label(ventana_edicion, text="📝 Español:").pack(pady=(0, 2))
+    entrada_esp = ttk.Entry(ventana_edicion, width=30)
     entrada_esp.insert(0, campo_esp)
-    entrada_esp.pack()
+    entrada_esp.pack(pady=(0, 10))
 
     def guardar_cambios():
-        nuevo_ing = entrada_ing.get()
-        nuevo_esp = entrada_esp.get()
+        nuevo_ing = entrada_ing.get().strip()
+        nuevo_esp = entrada_esp.get().strip()
+
+        if not nuevo_ing or not nuevo_esp:
+            messagebox.showwarning("⚠️ Campos vacíos", "Por favor, completa ambos campos antes de guardar.")
+            return
 
         conn = sqlite3.connect('english_store.db')
         cursor = conn.cursor()
@@ -63,7 +81,18 @@ def editar_registro(tabla, tree):
         tree.item(item, values=(id_registro, nuevo_ing, nuevo_esp))
         ventana_edicion.destroy()
 
-    tk.Button(ventana_edicion, text="Guardar", command=guardar_cambios).pack(pady=10)
+        # Simulación de animación con ventana emergente
+        confirm = tk.Toplevel()
+        confirm.title("✅ Cambios guardados")
+        confirm.geometry("250x100")
+        confirm.configure(bg="#e0f7e9")
+
+        ttk.Label(confirm, text="🎉 ¡Registro actualizado!", font=("Segoe UI", 11), background="#e0f7e9").pack(pady=20)
+        confirm.after(1500, confirm.destroy)
+
+    ttk.Button(ventana_edicion, text="💾 Guardar", command=guardar_cambios, style="Guardar.TButton").pack(pady=10)
+
+
 
 def filtrar_datos(tabla, tree, filtro):
     conn = sqlite3.connect('english_store.db')
@@ -101,19 +130,105 @@ def exportar_a_csv(tabla):
     try:
         with open(archivo, mode="w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
+
             encabezados = {
-                "palabras": ["ID", "Inglés", "Español"],
-                "phrasales": ["ID", "Phrasal Verb", "Traducción"],
-                "expresiones": ["ID", "Expresión", "Traducción"]
+                "palabras": ["Inglés", "Español"],
+                "phrasales": ["Phrasal Verb", "Traducción"],
+                "expresiones": ["Expresión", "Traducción"]
             }
             writer.writerow(encabezados[tabla])
+
             for fila in datos:
-                writer.writerow(fila)
+                writer.writerow(fila[1:])  # Ignora el ID
 
-        messagebox.showinfo("Exportación exitosa", f"Datos exportados a:\n{archivo}")
+        messagebox.showinfo("✅ Exportación exitosa", f"Datos exportados a:\n{archivo}")
     except Exception as e:
-        messagebox.showerror("Error", f"No se pudo exportar:\n{e}")
+        messagebox.showerror("❌ Error", f"No se pudo exportar:\n{e}")
 
+
+
+def mostrar_datos_tabla(tabla, parent):
+    ventana = tk.Toplevel(parent)
+    ventana.title(f"Datos de {tabla.capitalize()}")
+    ventana.geometry("750x550")
+    ventana.configure(bg="#f0f4ff")  # Fondo suave azul
+
+    style = ttk.Style()
+    style.theme_use("clam")
+
+    # Estilos personalizados
+    style.configure("TLabel", background="#f0f4ff", font=("Segoe UI", 11))
+    style.configure("TButton", font=("Segoe UI", 10, "bold"), padding=6)
+    style.configure("Treeview", font=("Segoe UI", 10), rowheight=28)
+    style.configure("Treeview.Heading", font=("Segoe UI", 11, "bold"), background="#d0e0ff")
+
+    # Título
+    ttk.Label(ventana, text="📘 Diccionario de Inglés", font=("Segoe UI", 16, "bold")).pack(pady=15)
+
+    # Campo de búsqueda
+    frame_busqueda = ttk.Frame(ventana)
+    frame_busqueda.pack(pady=10)
+
+    ttk.Label(frame_busqueda, text="Buscar:").pack(side="left", padx=5)
+    entrada_busqueda = ttk.Entry(frame_busqueda, width=40)
+    entrada_busqueda.pack(side="left", padx=5)
+
+    # Columnas dinámicas
+    columnas = {
+        "palabras": ("ID", "Inglés", "Español"),
+        "phrasales": ("ID", "Phrasal Verb", "Traducción"),
+        "expresiones": ("ID", "Expresión", "Traducción")
+    }
+
+    tree = ttk.Treeview(ventana, columns=columnas[tabla], show="headings")
+
+    for col in columnas[tabla]:
+        tree.heading(col, text=col)
+        if col == "ID":
+            tree.column(col, width=0, stretch=False)  # Oculta visualmente el ID
+        else:
+            tree.column(col, width=220)
+
+    tree.pack(fill="both", expand=True, padx=20, pady=10)
+
+    # Botones con colores
+    frame_botones = ttk.Frame(ventana)
+    frame_botones.pack(pady=15)
+
+    colores = {
+        "Eliminar": "#ff6b6b",
+        "Editar": "#ffa94d",
+        "Exportar": "#69db7c",
+        "Cerrar": "#74c0fc"
+    }
+
+    acciones = {
+        "Eliminar": lambda: eliminar_registro(tabla, tree),
+        "Editar": lambda: editar_registro(tabla, tree),
+        "Exportar": lambda: exportar_a_csv(tabla),
+        "Cerrar": ventana.destroy
+    }
+
+    for texto, color in colores.items():
+        btn_style = f"{texto}.TButton"
+        style.configure(btn_style, background=color, foreground="black")
+        ttk.Button(frame_botones, text=texto, command=acciones[texto], style=btn_style).pack(side="left", padx=10)
+
+    # Cargar datos
+    conn = sqlite3.connect('english_store.db')
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT * FROM {tabla}")
+    datos = cursor.fetchall()
+    conn.close()
+
+    for fila in datos:
+        tree.insert("", "end", values=fila)
+
+    entrada_busqueda.bind("<KeyRelease>", lambda e: filtrar_datos(tabla, tree, entrada_busqueda.get()))
+
+
+
+"""
 def mostrar_datos_tabla(tabla, parent):
     ventana = tk.Toplevel(parent)
     ventana.title(f"Datos de {tabla.capitalize()}")
@@ -156,5 +271,5 @@ def mostrar_datos_tabla(tabla, parent):
     for fila in datos:
         tree.insert("", "end", values=fila)
 
-    entrada_busqueda.bind("<KeyRelease>", lambda e: filtrar_datos(tabla, tree, entrada_busqueda.get()))
+    entrada_busqueda.bind("<KeyRelease>", lambda e: filtrar_datos(tabla, tree, entrada_busqueda.get()))"""
 

@@ -60,7 +60,10 @@ def abrir_ventana_words(parent):
     # Botón para volver al inicio
     ttk.Button(frame, text="Volver al inicio", command=ventana_a.destroy).grid(row=5, column=1, sticky="w", pady=10)
 
-    """
+
+
+
+"""
     # Botones
     ttk.Button(frame, text="Guardar palabra", command=grabar).grid(row=3, column=0, columnspan=2, pady=15)
     ttk.Button(frame, text="Ver palabras guardadas", command=lambda: mostrar_datos_tabla("palabras", ventana_a)).grid(row=4, column=0, columnspan=10)
