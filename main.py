@@ -33,20 +33,4 @@ ttk.Button(frame, text="Salir", command=ventana_principal.destroy).grid(row=4, c
 # Ejecutar la aplicación
 ventana_principal.mainloop()
 
-
-"""
-import tkinter as tk
-from palabras import abrir_ventana_words
-from expresiones import abrir_ventana_exps
-from phrasal import abrir_ventana_phrasal
-
-ventana_principal = tk.Tk()
-ventana_principal.title("Pantalla Principal")
-ventana_principal.geometry("600x400")
-
-tk.Button(ventana_principal, text="Words", command=lambda: abrir_ventana_words(ventana_principal)).pack(pady=10)
-tk.Button(ventana_principal, text="Expressions", command=lambda: abrir_ventana_exps(ventana_principal)).pack(pady=10)
-tk.Button(ventana_principal, text="Phrasal Verbs", command=lambda: abrir_ventana_phrasal(ventana_principal)).pack(pady=10)
-tk.Button(ventana_principal, text="Salir", command=ventana_principal.destroy).pack(side="bottom")
-
-ventana_principal.mainloop()"""
+# Prueba de comentario
