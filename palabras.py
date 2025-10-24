@@ -43,6 +43,8 @@ def abrir_ventana_words(parent):
         exito = database.crear_tabla_palabras(ing, esp)
         if not exito:
             messagebox.showerror("Duplicado", "La palabra ya existe.", parent=ventana_a)
+            entrada_palabras_eng.delete(0, tk.END)
+            entrada_palabras_esp.delete(0, tk.END)
         else:
             entrada_palabras_eng.delete(0, tk.END)
             entrada_palabras_esp.delete(0, tk.END)
