@@ -30,6 +30,7 @@ ttk.Button(frame, text="Phrasal Verbs", command=lambda: abrir_ventana_phrasal(ve
 
 # Botón de salida
 ttk.Button(frame, text="Salir", command=ventana_principal.destroy).grid(row=4, column=0, columnspan=2, pady=(20, 0))
+# Comentario de prueba
 
 # Ejecutar la aplicación
 ventana_principal.mainloop()
